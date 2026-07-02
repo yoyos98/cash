@@ -1,0 +1,954 @@
+/* ================================================================
+   FINANCIAL TRACKER PRO – FOGLIO DI STILE PRINCIPALE
+   Design System: Dark Mode Premium con Glassmorphism iOS-style
+   ================================================================ */
+
+/* ----------------------------------------------------------------
+   1. VARIABILI CSS – Palette, spaziatura, tipografia
+---------------------------------------------------------------- */
+:root {
+  /* Colori di sfondo */
+  --bg-primary:       #121214;
+  --bg-surface:       #1e1e24;
+  --bg-elevated:      #2a2a32;
+  --bg-overlay:       rgba(0, 0, 0, 0.65);
+
+  /* Colori di accento */
+  --accent-income:    #34d399;   /* Verde Smeraldo – Entrate   */
+  --accent-expense:   #f87171;   /* Rosso Corallo  – Uscite    */
+  --accent-primary:   #3b82f6;   /* Blu Elettrico  – Trend/CTA */
+  --accent-savings:   #a78bfa;   /* Viola          – Risparmi  */
+  --accent-warning:   #fbbf24;   /* Ambra          – Avvisi    */
+
+  /* Glassmorphism */
+  --glass-bg:         rgba(30, 30, 36, 0.75);
+  --glass-border:     rgba(255, 255, 255, 0.07);
+  --glass-blur:       20px;
+
+  /* Testo */
+  --text-primary:     #f1f1f3;
+  --text-secondary:   #8e8ea0;
+  --text-muted:       #56566a;
+  --text-inverse:     #121214;
+
+  /* Bordi e separatori */
+  --border-subtle:    rgba(255, 255, 255, 0.06);
+  --border-focus:     rgba(59, 130, 246, 0.6);
+
+  /* Raggio bordo */
+  --radius-sm:        8px;
+  --radius-md:        14px;
+  --radius-lg:        20px;
+  --radius-xl:        28px;
+  --radius-pill:      100px;
+
+  /* Spaziatura base (4pt grid) */
+  --space-xs:         4px;
+  --space-sm:         8px;
+  --space-md:         16px;
+  --space-lg:         24px;
+  --space-xl:         32px;
+  --space-2xl:        48px;
+
+  /* Ombre */
+  --shadow-card:      0 4px 24px rgba(0, 0, 0, 0.4);
+  --shadow-panel:     0 -8px 40px rgba(0, 0, 0, 0.6);
+  --shadow-btn:       0 4px 16px rgba(59, 130, 246, 0.35);
+
+  /* Transizioni */
+  --transition-fast:  0.15s ease;
+  --transition-base:  0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring:0.38s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Tipografia – Font di sistema (San Francisco su iOS, Roboto su Android) */
+  --font-system:      -apple-system, BlinkMacSystemFont, 'SF Pro Display',
+                      'Segoe UI', Roboto, sans-serif;
+  --font-mono:        'SF Mono', SFMono-Regular, ui-monospace, 'Roboto Mono', monospace;
+}
+
+/* ----------------------------------------------------------------
+   2. RESET E BASE
+---------------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent; /* Rimuove il flash blu su tap iOS */
+}
+
+html {
+  /* Impedisce il bounce-scroll eccessivo che rivela lo sfondo bianco */
+  background-color: var(--bg-primary);
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%; /* Impedisce resize automatico font su iOS */
+}
+
+body {
+  font-family: var(--font-system);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+  min-height: 100dvh;         /* dvh gestisce barre browser mobili */
+  overflow-x: hidden;
+  /* Migliora il rendering dei font su macOS/iOS */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ----------------------------------------------------------------
+   3. APP SHELL – Wrapper principale
+   Gestisce le Safe Areas iOS (notch in alto, home bar in basso)
+---------------------------------------------------------------- */
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  /* Padding top per la status bar iOS (notch / Dynamic Island) */
+  padding-top: env(safe-area-inset-top);
+  /* Padding bottom per l'indicatore di navigazione home */
+  padding-bottom: env(safe-area-inset-bottom);
+  position: relative;
+}
+
+/* ----------------------------------------------------------------
+   4. HEADER FISSO
+---------------------------------------------------------------- */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: var(--bg-primary);
+  /* Bordo sottile inferiore */
+  border-bottom: 1px solid var(--border-subtle);
+  /* Compensazione safe area se non già applicata dall'#app */
+  padding-top: 0;
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-md);
+  gap: var(--space-md);
+}
+
+.header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.app-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.app-subtitle {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+/* Bottone "+" di apertura form */
+.btn-add-toggle {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-pill);
+  background: var(--accent-primary);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-btn);
+  transition: transform var(--transition-spring), background var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.btn-add-toggle:active {
+  transform: scale(0.9);
+}
+
+.btn-add-icon {
+  font-size: 1.5rem;
+  font-weight: 300;
+  color: #fff;
+  line-height: 1;
+  display: block;
+  transition: transform var(--transition-spring);
+}
+
+/* Rotazione dell'icona quando il panel è aperto */
+.btn-add-toggle.is-open .btn-add-icon {
+  transform: rotate(45deg);
+}
+
+/* ----------------------------------------------------------------
+   5. PANNELLO DI INSERIMENTO RAPIDO (bottom sheet iOS-style)
+---------------------------------------------------------------- */
+.quick-add-panel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-bottom: none;
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  padding: var(--space-sm) var(--space-md) calc(var(--space-xl) + env(safe-area-inset-bottom));
+  box-shadow: var(--shadow-panel);
+  /* Stato iniziale: pannello nascosto sotto lo schermo */
+  transform: translateY(105%);
+  transition: transform var(--transition-spring);
+  max-height: 92dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* Stato aperto */
+.quick-add-panel.is-open {
+  transform: translateY(0);
+}
+
+/* Handle per trascinare (indicatore visivo iOS) */
+.panel-handle {
+  width: 40px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--text-muted);
+  margin: var(--space-sm) auto var(--space-md);
+}
+
+.panel-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: center;
+  margin-bottom: var(--space-lg);
+  letter-spacing: -0.2px;
+}
+
+/* ----------------------------------------------------------------
+   6. TOGGLE ENTRATA / USCITA
+---------------------------------------------------------------- */
+.type-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-xs);
+  background: var(--bg-elevated);
+  border-radius: var(--radius-md);
+  padding: var(--space-xs);
+  margin-bottom: var(--space-md);
+}
+
+.toggle-btn {
+  padding: var(--space-sm) var(--space-md);
+  border: none;
+  border-radius: calc(var(--radius-md) - 4px);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: var(--font-system);
+  cursor: pointer;
+  transition: background var(--transition-base), color var(--transition-base),
+              transform var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+}
+
+.toggle-btn:active {
+  transform: scale(0.97);
+}
+
+/* Stato attivo Entrata */
+.toggle-btn.active[data-type="entrata"] {
+  background: rgba(52, 211, 153, 0.18);
+  color: var(--accent-income);
+}
+
+/* Stato attivo Uscita */
+.toggle-btn.active[data-type="uscita"] {
+  background: rgba(248, 113, 113, 0.18);
+  color: var(--accent-expense);
+}
+
+.toggle-icon {
+  font-size: 1rem;
+  font-style: normal;
+}
+
+/* ----------------------------------------------------------------
+   7. FORM DI INSERIMENTO
+---------------------------------------------------------------- */
+.form-group {
+  margin-bottom: var(--space-md);
+}
+
+.form-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  margin-bottom: var(--space-xs);
+}
+
+.form-input {
+  width: 100%;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-family: var(--font-system);
+  padding: var(--space-sm) var(--space-md);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  outline: none;
+  -webkit-appearance: none; /* Rimuove stili nativi iOS sui select/input */
+  appearance: none;
+}
+
+.form-input:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.form-input::placeholder {
+  color: var(--text-muted);
+}
+
+/* Campo importo con simbolo € prominente */
+.amount-group {
+  margin-bottom: var(--space-lg);
+}
+
+.amount-input-wrapper {
+  display: flex;
+  align-items: center;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.amount-input-wrapper:focus-within {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.currency-symbol {
+  padding: 0 var(--space-md);
+  font-size: 1.6rem;
+  font-weight: 300;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.amount-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  font-size: 2rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  padding: var(--space-md) var(--space-md) var(--space-md) 0;
+  letter-spacing: -0.5px;
+}
+
+.amount-input:focus {
+  box-shadow: none;
+  border-color: transparent;
+}
+
+/* Select con freccia personalizzata */
+.form-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238e8ea0' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--space-md) center;
+  padding-right: 40px;
+  cursor: pointer;
+}
+
+/* Select option in dark mode (solo browser che lo supportano) */
+.form-select option {
+  background-color: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+/* Messaggio di errore */
+.form-error {
+  font-size: 0.82rem;
+  color: var(--accent-expense);
+  min-height: 1.2rem;
+  margin-bottom: var(--space-sm);
+  padding-left: var(--space-xs);
+}
+
+/* Bottone submit */
+.btn-submit {
+  width: 100%;
+  padding: var(--space-md);
+  border: none;
+  border-radius: var(--radius-lg);
+  background: var(--accent-primary);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: var(--font-system);
+  cursor: pointer;
+  box-shadow: var(--shadow-btn);
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
+  letter-spacing: 0.2px;
+}
+
+.btn-submit:active {
+  transform: scale(0.98);
+  opacity: 0.9;
+}
+
+/* ----------------------------------------------------------------
+   8. OVERLAY SCURO (sfondo del bottom sheet)
+---------------------------------------------------------------- */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  background: var(--bg-overlay);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-base);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+}
+
+.overlay.is-visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ----------------------------------------------------------------
+   9. CONTENUTO PRINCIPALE
+---------------------------------------------------------------- */
+.main-content {
+  flex: 1;
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  padding-bottom: var(--space-2xl);
+}
+
+/* ----------------------------------------------------------------
+   10. SEZIONI – Struttura comune
+---------------------------------------------------------------- */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.section-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.1px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+/* ----------------------------------------------------------------
+   11. SCHEDE RIASSUNTIVE (Dashboard)
+   Layout a scroll orizzontale su schermi molto stretti,
+   griglia fissa su iPhone standard (375px+)
+---------------------------------------------------------------- */
+.cards-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-sm);
+}
+
+.summary-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md) var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  box-shadow: var(--shadow-card);
+  transition: transform var(--transition-fast);
+  /* Top accent bar colorata */
+  position: relative;
+  overflow: hidden;
+}
+
+.summary-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: 2px 2px 0 0;
+}
+
+.card-income::before  { background: var(--accent-income); }
+.card-expense::before { background: var(--accent-expense); }
+.card-savings::before { background: var(--accent-savings); }
+
+.card-icon {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.card-income  .card-icon { color: var(--accent-income); }
+.card-expense .card-icon { color: var(--accent-expense); }
+.card-savings .card-icon { color: var(--accent-savings); }
+
+.card-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.card-value {
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  word-break: break-all;
+}
+
+.card-income  .card-value { color: var(--accent-income); }
+.card-expense .card-value { color: var(--accent-expense); }
+.card-savings .card-value { color: var(--accent-savings); }
+
+/* ----------------------------------------------------------------
+   12. SEZIONE GRAFICO
+---------------------------------------------------------------- */
+.chart-section {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  box-shadow: var(--shadow-card);
+}
+
+.chart-period-selector {
+  display: flex;
+  gap: var(--space-xs);
+  background: var(--bg-elevated);
+  border-radius: var(--radius-pill);
+  padding: 3px;
+}
+
+.period-btn {
+  padding: 5px var(--space-sm);
+  border: none;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: var(--font-system);
+  cursor: pointer;
+  transition: background var(--transition-base), color var(--transition-base);
+}
+
+.period-btn.active {
+  background: var(--accent-primary);
+  color: #fff;
+}
+
+.chart-container {
+  position: relative;
+  height: 200px;
+  margin-top: var(--space-md);
+}
+
+.chart-empty-state {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  min-height: 100px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.chart-empty-state.is-visible {
+  display: flex;
+}
+
+/* ----------------------------------------------------------------
+   13. SEZIONE CONSIGLI – Smart Financial Advisor
+---------------------------------------------------------------- */
+.advice-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.advice-placeholder {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.advice-placeholder-icon {
+  font-size: 2rem;
+  display: block;
+}
+
+/* Singola card consiglio */
+.advice-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  border-left: 4px solid transparent;
+  box-shadow: var(--shadow-card);
+  animation: slideInAdvice var(--transition-base) ease;
+}
+
+@keyframes slideInAdvice {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.advice-card.advice-warning { border-color: var(--accent-warning); }
+.advice-card.advice-positive { border-color: var(--accent-income); }
+.advice-card.advice-info    { border-color: var(--accent-primary); }
+.advice-card.advice-savings { border-color: var(--accent-savings); }
+
+.advice-emoji {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+.advice-body {
+  flex: 1;
+}
+
+.advice-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.advice-text {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+/* Badge risparmio in crescita */
+.savings-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  background: rgba(167, 139, 250, 0.15);
+  border: 1px solid rgba(167, 139, 250, 0.3);
+  border-radius: var(--radius-pill);
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent-savings);
+  margin-top: var(--space-sm);
+}
+
+/* ----------------------------------------------------------------
+   14. SEZIONE CRONOLOGIA TRANSAZIONI
+---------------------------------------------------------------- */
+.history-filters {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.filter-btn {
+  padding: 6px var(--space-md);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: var(--font-system);
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast),
+              border-color var(--transition-fast);
+}
+
+.filter-btn.active {
+  background: var(--accent-primary);
+  color: #fff;
+  border-color: var(--accent-primary);
+}
+
+.history-empty {
+  text-align: center;
+  padding: var(--space-xl);
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.empty-icon {
+  font-size: 2.5rem;
+  display: block;
+}
+
+.transaction-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* Gruppo per data */
+.day-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.day-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  padding: 0 var(--space-xs);
+  margin-bottom: 2px;
+}
+
+/* Singola riga transazione */
+.transaction-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
+  transition: opacity var(--transition-base), transform var(--transition-base);
+  animation: slideInItem 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes slideInItem {
+  from { opacity: 0; transform: translateX(-10px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.transaction-item.is-removing {
+  opacity: 0;
+  transform: translateX(40px);
+  pointer-events: none;
+}
+
+/* Icona categoria nella transazione */
+.tx-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.tx-icon.icon-income  { background: rgba(52, 211, 153, 0.15); }
+.tx-icon.icon-expense { background: rgba(248, 113, 113, 0.15); }
+
+/* Corpo testo della transazione */
+.tx-body {
+  flex: 1;
+  min-width: 0; /* Necessario per il text-overflow */
+}
+
+.tx-desc {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tx-category {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* Importo della transazione */
+.tx-amount {
+  font-size: 0.95rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.2px;
+  flex-shrink: 0;
+}
+
+.tx-amount.amount-income  { color: var(--accent-income); }
+.tx-amount.amount-expense { color: var(--accent-expense); }
+
+/* Bottone elimina transazione */
+.tx-delete {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: rgba(248, 113, 113, 0.12);
+  color: var(--accent-expense);
+  font-size: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+  margin-left: var(--space-sm);
+}
+
+.tx-delete:active {
+  transform: scale(0.88);
+  background: rgba(248, 113, 113, 0.25);
+}
+
+/* ----------------------------------------------------------------
+   15. UTILITÀ
+---------------------------------------------------------------- */
+
+/* Nasconde gli elementi accessibili ma non visivi */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Stato nascosto generico (usato via JS) */
+.hidden {
+  display: none !important;
+}
+
+/* ----------------------------------------------------------------
+   16. SCROLLBAR PERSONALIZZATA (solo su Webkit/Blink)
+---------------------------------------------------------------- */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bg-elevated);
+  border-radius: 2px;
+}
+
+/* ----------------------------------------------------------------
+   17. MEDIA QUERIES – Adattamenti per tablet e desktop
+   L'app rimane centrata e con larghezza massima su schermi grandi
+---------------------------------------------------------------- */
+@media (min-width: 480px) {
+  #app {
+    max-width: 430px;
+    margin: 0 auto;
+    /* Bordi visibili su desktop */
+    box-shadow: 0 0 60px rgba(0,0,0,0.8);
+    min-height: 100dvh;
+  }
+
+  .cards-row {
+    gap: var(--space-md);
+  }
+
+  .card-value {
+    font-size: 1rem;
+  }
+}
+
+/* ----------------------------------------------------------------
+   18. ANIMAZIONI DI FEEDBACK TATTILE
+   Usati da JS per confermare inserimento riuscito
+---------------------------------------------------------------- */
+@keyframes successPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.5); }
+  70%  { box-shadow: 0 0 0 10px rgba(52, 211, 153, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+}
+
+.btn-submit.success-pulse {
+  animation: successPulse 0.6s ease;
+}
+
+/* ----------------------------------------------------------------
+   19. INPUT TYPE NUMBER – Rimuove spinner nativi
+---------------------------------------------------------------- */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
