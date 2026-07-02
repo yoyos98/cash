@@ -1,16 +1,30 @@
 {
-  "name": "\u20ac Finance",
-  "short_name": "\u20ac",
-  "start_url": "./index.html",
+  "name": "Financial Tracker Pro",
+  "short_name": "Spese",
+  "description": "Traccia spese e guadagni in modo intelligente con consigli personalizzati",
+  "start_url": "index.html",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#000000",
   "orientation": "portrait",
+  "background_color": "#121214",
+  "theme_color": "#121214",
+  "lang": "it",
+  "dir": "ltr",
+  "categories": ["finance", "productivity", "utilities"],
   "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
     {
       "src": "icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
-  ]
+  ],
+  "screenshots": [],
+  "shortcuts": []
 }

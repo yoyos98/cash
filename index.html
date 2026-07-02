@@ -1,20 +1,255 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#000000">
-<title>€ Finance</title>
-<style>
-body{background:#000;color:#fff;font-family:-apple-system;}
-</style>
+  <!-- ============================================================
+       META TAGS BASE
+  ============================================================ -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="Financial Tracker Pro – traccia spese e guadagni in modo intelligente" />
+
+  <!-- ============================================================
+       META TAG PWA / iOS STANDALONE
+       Permettono all'app di comportarsi come nativa su iPhone
+  ============================================================ -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Spese" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#121214" />
+
+  <!-- Icona per la Home Screen di iOS (Apple Touch Icon) -->
+  <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png" />
+  <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
+
+  <!-- Manifest PWA per installazione su Android e desktop -->
+  <link rel="manifest" href="manifest.json" />
+
+  <!-- ============================================================
+       FOGLIO DI STILE PRINCIPALE
+  ============================================================ -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- ============================================================
+       CHART.JS – Libreria per i grafici (CDN stabile)
+  ============================================================ -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <title>Financial Tracker Pro</title>
 </head>
 <body>
-<h1>App caricata</h1>
 
-<script>
-console.log("PWA base loaded");
-</script>
+  <!-- ============================================================
+       APP SHELL WRAPPER
+       Contiene l'intero layout dell'applicazione.
+       Il padding-top/bottom gestisce le safe areas iOS (notch + home bar).
+  ============================================================ -->
+  <div id="app">
+
+    <!-- ============================================================
+         HEADER FISSO – Titolo e mese corrente
+    ============================================================ -->
+    <header class="app-header">
+      <div class="header-inner">
+        <div class="header-left">
+          <h1 class="app-title">Financial Tracker</h1>
+          <p class="app-subtitle" id="currentMonthLabel">Luglio 2026</p>
+        </div>
+        <div class="header-right">
+          <!-- Bottone apri/chiudi pannello di inserimento rapido -->
+          <button class="btn-add-toggle" id="btnToggleForm" aria-label="Aggiungi transazione">
+            <span class="btn-add-icon" id="addIcon">+</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- ============================================================
+         PANNELLO DI INSERIMENTO RAPIDO (QUICK ADD FORM)
+         Visibile/nascosto via JS. Appare come sheet nativo iOS.
+    ============================================================ -->
+    <section class="quick-add-panel" id="quickAddPanel" aria-hidden="true">
+      <div class="panel-handle"></div>
+
+      <h2 class="panel-title">Nuova Transazione</h2>
+
+      <!-- Toggle Entrata / Uscita -->
+      <div class="type-toggle" role="group" aria-label="Tipo transazione">
+        <button class="toggle-btn active" id="btnEntrata" data-type="entrata">
+          <span class="toggle-icon">↑</span> Entrata
+        </button>
+        <button class="toggle-btn" id="btnUscita" data-type="uscita">
+          <span class="toggle-icon">↓</span> Uscita
+        </button>
+      </div>
+
+      <!-- Form di inserimento -->
+      <form id="transactionForm" novalidate>
+
+        <!-- Campo importo (numerico grande, prominente) -->
+        <div class="form-group amount-group">
+          <label class="form-label" for="inputAmount">Importo</label>
+          <div class="amount-input-wrapper">
+            <span class="currency-symbol">€</span>
+            <input
+              type="number"
+              id="inputAmount"
+              class="form-input amount-input"
+              placeholder="0.00"
+              min="0"
+              step="0.01"
+              inputmode="decimal"
+              required
+              aria-required="true"
+            />
+          </div>
+        </div>
+
+        <!-- Campo descrizione -->
+        <div class="form-group">
+          <label class="form-label" for="inputDesc">Descrizione</label>
+          <input
+            type="text"
+            id="inputDesc"
+            class="form-input"
+            placeholder="Es. Stipendio, Cena con amici…"
+            maxlength="80"
+            required
+            aria-required="true"
+          />
+        </div>
+
+        <!-- Menu a tendina categoria – aggiornato dinamicamente dal JS -->
+        <div class="form-group">
+          <label class="form-label" for="inputCategory">Categoria</label>
+          <select id="inputCategory" class="form-input form-select" required aria-required="true">
+            <!-- Le opzioni vengono iniettate da script.js in base al tipo -->
+          </select>
+        </div>
+
+        <!-- Messaggio di errore di validazione -->
+        <p class="form-error" id="formError" role="alert" aria-live="polite"></p>
+
+        <!-- Bottone di conferma -->
+        <button type="submit" class="btn-submit" id="btnSubmit">
+          Aggiungi Transazione
+        </button>
+
+      </form>
+    </section>
+
+    <!-- ============================================================
+         CONTENUTO PRINCIPALE SCROLLABILE
+    ============================================================ -->
+    <main class="main-content" id="mainContent">
+
+      <!-- ----------------------------------------------------------
+           SEZIONE RENDICONTO – Tre schede riassuntive
+      ---------------------------------------------------------- -->
+      <section class="section dashboard-section" aria-label="Rendiconto mensile">
+        <h2 class="section-title">Questo Mese</h2>
+
+        <div class="cards-row" id="summaryCards">
+
+          <!-- Scheda Entrate Mensili -->
+          <div class="summary-card card-income" role="article">
+            <span class="card-icon">↑</span>
+            <span class="card-label">Entrate</span>
+            <span class="card-value" id="totalIncomeMonthly">€0,00</span>
+          </div>
+
+          <!-- Scheda Uscite Mensili -->
+          <div class="summary-card card-expense" role="article">
+            <span class="card-icon">↓</span>
+            <span class="card-label">Uscite</span>
+            <span class="card-value" id="totalExpenseMonthly">€0,00</span>
+          </div>
+
+          <!-- Scheda Risparmi Storici Accumulati -->
+          <div class="summary-card card-savings" role="article">
+            <span class="card-icon">★</span>
+            <span class="card-label">Risparmiati</span>
+            <span class="card-value" id="totalSavingsAll">€0,00</span>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ----------------------------------------------------------
+           SEZIONE ANALITICA – Grafico andamento finanziario
+      ---------------------------------------------------------- -->
+      <section class="section chart-section" aria-label="Grafico andamento finanziario">
+        <div class="section-header">
+          <h2 class="section-title">Andamento</h2>
+          <!-- Selettore periodo grafico -->
+          <div class="chart-period-selector">
+            <button class="period-btn active" data-period="6m">6M</button>
+            <button class="period-btn" data-period="3m">3M</button>
+            <button class="period-btn" data-period="1m">1M</button>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="financeChart" role="img" aria-label="Grafico andamento finanziario mensile"></canvas>
+        </div>
+        <!-- Stato vuoto del grafico -->
+        <div class="chart-empty-state" id="chartEmptyState">
+          <p>Aggiungi transazioni per vedere il grafico</p>
+        </div>
+      </section>
+
+      <!-- ----------------------------------------------------------
+           SEZIONE FEEDBACK INTELLIGENTE – Smart Financial Advisor
+      ---------------------------------------------------------- -->
+      <section class="section advice-section" aria-label="Consigli finanziari">
+        <h2 class="section-title">Consigli & Trend</h2>
+        <div id="adviceContainer" class="advice-container">
+          <!-- I consigli vengono iniettati dinamicamente dal JS -->
+          <div class="advice-placeholder">
+            <span class="advice-placeholder-icon">💡</span>
+            <p>Aggiungi almeno una transazione per ricevere consigli personalizzati.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ----------------------------------------------------------
+           SEZIONE CRONOLOGIA – Lista transazioni
+      ---------------------------------------------------------- -->
+      <section class="section history-section" aria-label="Cronologia transazioni">
+        <div class="section-header">
+          <h2 class="section-title">Cronologia</h2>
+          <!-- Filtri rapidi per tipo -->
+          <div class="history-filters">
+            <button class="filter-btn active" data-filter="all">Tutto</button>
+            <button class="filter-btn" data-filter="entrata">Entrate</button>
+            <button class="filter-btn" data-filter="uscita">Uscite</button>
+          </div>
+        </div>
+
+        <!-- Stato vuoto della lista -->
+        <div class="history-empty" id="historyEmpty">
+          <span class="empty-icon">📋</span>
+          <p>Nessuna transazione ancora.<br/>Premi <strong>+</strong> per iniziare!</p>
+        </div>
+
+        <!-- Lista transazioni raggruppate per giorno -->
+        <div id="transactionList" class="transaction-list" role="list">
+          <!-- I gruppi di giorni vengono iniettati dinamicamente dal JS -->
+        </div>
+      </section>
+
+    </main><!-- /main-content -->
+
+  </div><!-- /app -->
+
+  <!-- ============================================================
+       OVERLAY scuro quando il pannello rapido è aperto
+  ============================================================ -->
+  <div class="overlay" id="overlay" aria-hidden="true"></div>
+
+  <!-- ============================================================
+       SCRIPT PRINCIPALE
+  ============================================================ -->
+  <script src="script.js"></script>
+
 </body>
 </html>
